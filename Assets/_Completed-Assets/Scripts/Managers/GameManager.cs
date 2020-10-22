@@ -15,7 +15,6 @@ namespace Complete
         public GameObject m_TankPrefab;             // Reference to the prefab the players will control.
         public TankManager[] m_Tanks;               // A collection of managers for enabling and disabling different aspects of the tanks.
 
-        
         private int m_RoundNumber;                  // Which round the game is currently on.
         private WaitForSeconds m_StartWait;         // Used to have a delay whilst the round starts.
         private WaitForSeconds m_EndWait;           // Used to have a delay whilst the round or game ends.
@@ -47,10 +46,19 @@ namespace Complete
                     Instantiate(m_TankPrefab, m_Tanks[i].m_SpawnPoint.position, m_Tanks[i].m_SpawnPoint.rotation) as GameObject;
                 m_Tanks[i].m_PlayerNumber = i + 1;
                 m_Tanks[i].Setup();
+
             }
+
+            for (int y = 0; y < m_Tanks.Length; y++)
+            {
+                m_Tanks[y].m_Instance.GetComponent<TankShooting>().m_target = m_Tanks[(y + 1) % (m_Tanks.Length )].m_Instance;
+                if (y == 0)
+                    m_Tanks[y].m_Instance.GetComponent<TankMovement>().UseWander();
+                if(y==1)
+                    m_Tanks[y].m_Instance.GetComponent<TankMovement>().UsePatrol();
+            }
+
         }
-
-
         private void SetCameraTargets()
         {
             // Create a collection of transforms the same size as the number of tanks.

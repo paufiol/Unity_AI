@@ -5,6 +5,8 @@ namespace Complete
 {
     public class TankShooting : MonoBehaviour
     {
+
+        public bool m_usingAI;
         public int m_PlayerNumber = 1;              // Used to identify the different players.
         public Rigidbody m_Shell;                   // Prefab of the shell.
         public Transform m_FireTransform;           // A child of the tank where the shells are spawned.
@@ -22,6 +24,15 @@ namespace Complete
         private float m_ChargeSpeed;                // How fast the launch force increases, based on the max charge time.
         private bool m_Fired;                       // Whether or not the shell has been launched with this button press.
 
+        private string m_PitchCanonRotationButton;
+        private string m_YawCanonRotationButton;
+        public float m_PitchCanonRotationSpeed;
+        public float m_YawCanonRotationSpeed;
+        public GameObject m_tankTurret;
+        public GameObject m_target = null;
+
+        public GameObject m_GameManager;
+
 
         private void OnEnable()
         {
@@ -30,11 +41,12 @@ namespace Complete
             m_AimSlider.value = m_MinLaunchForce;
         }
 
-
         private void Start ()
         {
             // The fire axis is based on the player number.
             m_FireButton = "Fire" + m_PlayerNumber;
+            m_PitchCanonRotationButton = "PitchCanonRotation" + m_PlayerNumber;
+            m_YawCanonRotationButton = "YawCanonRotation" + m_PlayerNumber;
 
             // The rate that the launch force charges up is the range of possible forces by the max charge time.
             m_ChargeSpeed = (m_MaxLaunchForce - m_MinLaunchForce) / m_MaxChargeTime;
@@ -43,43 +55,75 @@ namespace Complete
 
         private void Update ()
         {
-            // The slider should have a default value of the minimum launch force.
-            m_AimSlider.value = m_MinLaunchForce;
+            if (m_usingAI)
+            {
+                if(m_target == null)
+                {
+                    //m_target = m_GameManager.GetComponent<GameManager>.m_Tanks[0].m_Instance.gameObject;
+                    //Debug.Log(m_GameManager.m_Tanks[0].m_Instance.gameObject);
+                    //Debug.Log(m_GameManager.m_Tanks.Length);
+                }
 
-            // If the max force has been exceeded and the shell hasn't yet been launched...
-            if (m_CurrentLaunchForce >= m_MaxLaunchForce && !m_Fired)
-            {
-                // ... use the max force and launch the shell.
-                m_CurrentLaunchForce = m_MaxLaunchForce;
-                Fire ();
-            }
-            // Otherwise, if the fire button has just started being pressed...
-            else if (Input.GetButtonDown (m_FireButton))
-            {
-                // ... reset the fired flag and reset the launch force.
-                m_Fired = false;
-                m_CurrentLaunchForce = m_MinLaunchForce;
+                LookAtTarget();
 
-                // Change the clip to the charging clip and start it playing.
-                m_ShootingAudio.clip = m_ChargingClip;
-                m_ShootingAudio.Play ();
             }
-            // Otherwise, if the fire button is being held and the shell hasn't been launched yet...
-            else if (Input.GetButton (m_FireButton) && !m_Fired)
+            else
             {
-                // Increment the launch force and update the slider.
-                m_CurrentLaunchForce += m_ChargeSpeed * Time.deltaTime;
+                RotateCanon();
+                // The slider should have a default value of the minimum launch force.
+                m_AimSlider.value = m_MinLaunchForce;
 
-                m_AimSlider.value = m_CurrentLaunchForce;
-            }
-            // Otherwise, if the fire button is released and the shell hasn't been launched yet...
-            else if (Input.GetButtonUp (m_FireButton) && !m_Fired)
-            {
-                // ... launch the shell.
-                Fire ();
+                // If the max force has been exceeded and the shell hasn't yet been launched...
+                if (m_CurrentLaunchForce >= m_MaxLaunchForce && !m_Fired)
+                {
+                    // ... use the max force and launch the shell.
+                    m_CurrentLaunchForce = m_MaxLaunchForce;
+                    Fire();
+                }
+                // Otherwise, if the fire button has just started being pressed...
+                else if (Input.GetButtonDown(m_FireButton))
+                {
+                    // ... reset the fired flag and reset the launch force.
+                    m_Fired = false;
+                    m_CurrentLaunchForce = m_MinLaunchForce;
+
+                    // Change the clip to the charging clip and start it playing.
+                    m_ShootingAudio.clip = m_ChargingClip;
+                    m_ShootingAudio.Play();
+                }
+                // Otherwise, if the fire button is being held and the shell hasn't been launched yet...
+                else if (Input.GetButton(m_FireButton) && !m_Fired)
+                {
+                    // Increment the launch force and update the slider.
+                    m_CurrentLaunchForce += m_ChargeSpeed * Time.deltaTime;
+
+                    m_AimSlider.value = m_CurrentLaunchForce;
+                }
+                // Otherwise, if the fire button is released and the shell hasn't been launched yet...
+                else if (Input.GetButtonUp(m_FireButton) && !m_Fired)
+                {
+                    // ... launch the shell.
+                    Fire();
+                }
             }
         }
 
+        private void LookAtTarget()
+        {
+            //m_tankTurret.transform.LookAt(m_target.transform);
+
+            var q = Quaternion.LookRotation(m_target.transform.position- transform.position);
+            m_tankTurret.transform.rotation = Quaternion.RotateTowards(m_tankTurret.transform.rotation, q, 100 * Time.deltaTime);
+        }
+
+        private void RotateCanon()
+        {
+            float pitchRotation = Input.GetAxis(m_PitchCanonRotationButton) * m_PitchCanonRotationSpeed * Time.deltaTime;
+            m_tankTurret.transform.Rotate(new Vector3(pitchRotation,0f,0f));
+
+            float yawRotation = Input.GetAxis(m_YawCanonRotationButton) * m_YawCanonRotationSpeed * Time.deltaTime;
+            m_tankTurret.transform.Rotate(new Vector3(0f, yawRotation, 0f));
+        }
 
         private void Fire ()
         {
