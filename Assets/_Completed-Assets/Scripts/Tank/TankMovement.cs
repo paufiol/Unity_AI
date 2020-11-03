@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using Unity.UNetWeaver;
+using UnityEngine;
+using UnityEngine.AI;
 
 namespace Complete
 {
@@ -22,6 +24,12 @@ namespace Complete
 
         delegate void AiMovement();
         AiMovement MovementDelegate;
+        public bool m_UsingAi = true;
+
+        //Patrol
+        int m_CurrentDestination = 0;
+        public Transform[] m_PatrolPoints;
+        private NavMeshAgent m_Agent;
         
         private void Awake ()
         {
@@ -114,8 +122,13 @@ namespace Complete
         private void FixedUpdate ()
         {
             // Adjust the rigidbodies position and orientation in FixedUpdate.
-            Move ();
-            Turn ();
+            if (m_UsingAi)
+                MovementDelegate();
+            else
+            {
+                Move();
+                Turn();
+            }
         }
 
 
@@ -149,15 +162,49 @@ namespace Complete
         public void UsePatrol()
         {
             MovementDelegate = Patrol;
+
+            m_Agent = GetComponent<NavMeshAgent>();
+            m_PatrolPoints = GetPatrolPoints("PatrolPoint");
         }
 
         void Wander()
         {
-
+            Debug.Log("Im wandering");
         }
 
         void Patrol()
         {
+            if (!m_Agent.pathPending && m_Agent.remainingDistance < 0.5f)
+                NextPatrolPoint();
+        }
+
+        void NextPatrolPoint()
+        {
+            if(m_PatrolPoints.Length == 0)
+            {
+                Debug.Log("There are no patrolling points");
+                return; 
+            }
+
+            m_Agent.destination = m_PatrolPoints[m_CurrentDestination].position;
+            m_CurrentDestination = (m_CurrentDestination + 1) % m_PatrolPoints.Length;
+        }
+
+        Transform[] GetPatrolPoints(string tag)
+        {
+            var ret = new System.Collections.Generic.List<Transform>();
+            var objects = FindObjectsOfType(typeof(GameObject)) as GameObject[];
+            for(int i= 0; i< objects.Length;i++)
+            {
+                if(objects[i].tag == tag)
+                {
+                    ret.Add(objects[i].transform);
+                    Debug.Log("transform found");
+                }
+                Debug.Log(objects[i].tag);
+            }
+           
+            return ret.ToArray();
 
         }
     }
