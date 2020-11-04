@@ -65,8 +65,7 @@ namespace Complete
             if (m_UsingAI)
             {
                 m_ShotTimer -= Time.deltaTime;
-
-                LookAtTarget();
+                RotateCanon();
 
                 if (m_ShotTimer <= 0.0f)
                 {
@@ -115,22 +114,13 @@ namespace Complete
             }
         }
 
-        private void LookAtTarget()
-        {
-            //m_tankTurret.transform.LookAt(m_target.transform);
-
-            var q = Quaternion.LookRotation(m_Target.transform.position - transform.position);
-            m_TankTurret.transform.rotation = Quaternion.RotateTowards(m_TankTurret.transform.rotation, q, 100 * Time.deltaTime);
-
-            //Debug.Log("Looking at target");
-        }
-
         private void RotateCanon()
         {
             if (m_UsingAI)
             {
-               
 
+                var q = Quaternion.LookRotation(m_Target.transform.position - transform.position);
+                m_TankTurret.transform.rotation = Quaternion.RotateTowards(m_TankTurret.transform.rotation, q, 100 * Time.deltaTime);
             }
             else
             {
