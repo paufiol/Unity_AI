@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using Unity.UNetWeaver;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Complete
@@ -6,7 +8,7 @@ namespace Complete
     public class TankShooting : MonoBehaviour
     {
 
-        public bool m_usingAI;
+        public bool m_UsingAI = true;
         public int m_PlayerNumber = 1;              // Used to identify the different players.
         public Rigidbody m_Shell;                   // Prefab of the shell.
         public Transform m_FireTransform;           // A child of the tank where the shells are spawned.
@@ -28,10 +30,15 @@ namespace Complete
         private string m_YawCanonRotationButton;
         public float m_PitchCanonRotationSpeed;
         public float m_YawCanonRotationSpeed;
-        public GameObject m_tankTurret;
-        public GameObject m_target = null;
+        public GameObject m_TankTurret;
+        public GameObject m_Target = null;
 
         public GameObject m_GameManager;
+
+        //Shot calculation
+        private float m_TargetDistance;
+        public float m_ShotSpeed;
+        public float m_ShotTimer = 3.0f;
 
 
         private void OnEnable()
@@ -55,17 +62,17 @@ namespace Complete
 
         private void Update ()
         {
-            if (m_usingAI)
+            if (m_UsingAI)
             {
-                if(m_target == null)
-                {
-                    //m_target = m_GameManager.GetComponent<GameManager>.m_Tanks[0].m_Instance.gameObject;
-                    //Debug.Log(m_GameManager.m_Tanks[0].m_Instance.gameObject);
-                    //Debug.Log(m_GameManager.m_Tanks.Length);
-                }
+                m_ShotTimer -= Time.deltaTime;
 
                 LookAtTarget();
 
+                if (m_ShotTimer <= 0.0f)
+                {
+                    Fire();
+                    m_ShotTimer = 3.0f;
+                }
             }
             else
             {
@@ -112,37 +119,71 @@ namespace Complete
         {
             //m_tankTurret.transform.LookAt(m_target.transform);
 
-            var q = Quaternion.LookRotation(m_target.transform.position- transform.position);
-            m_tankTurret.transform.rotation = Quaternion.RotateTowards(m_tankTurret.transform.rotation, q, 100 * Time.deltaTime);
+            var q = Quaternion.LookRotation(m_Target.transform.position - transform.position);
+            m_TankTurret.transform.rotation = Quaternion.RotateTowards(m_TankTurret.transform.rotation, q, 100 * Time.deltaTime);
+
+            //Debug.Log("Looking at target");
         }
 
         private void RotateCanon()
         {
-            float pitchRotation = Input.GetAxis(m_PitchCanonRotationButton) * m_PitchCanonRotationSpeed * Time.deltaTime;
-            m_tankTurret.transform.Rotate(new Vector3(pitchRotation,0f,0f));
+            if (m_UsingAI)
+            {
+               
 
-            float yawRotation = Input.GetAxis(m_YawCanonRotationButton) * m_YawCanonRotationSpeed * Time.deltaTime;
-            m_tankTurret.transform.Rotate(new Vector3(0f, yawRotation, 0f));
+            }
+            else
+            {
+                float pitchRotation = Input.GetAxis(m_PitchCanonRotationButton) * m_PitchCanonRotationSpeed * Time.deltaTime;
+                m_TankTurret.transform.Rotate(new Vector3(pitchRotation, 0f, 0f));
+
+                float yawRotation = Input.GetAxis(m_YawCanonRotationButton) * m_YawCanonRotationSpeed * Time.deltaTime;
+                m_TankTurret.transform.Rotate(new Vector3(0f, yawRotation, 0f));
+            }
         }
 
         private void Fire ()
         {
+            if (m_UsingAI)
+            {
+                m_TargetDistance = Vector3.Distance(m_TankTurret.transform.position, m_Target.transform.position);
+
+                float calc = Physics.gravity.y * (m_TargetDistance * m_TargetDistance);//; +2 * 0
+                double calc1 = Math.Sqrt( (m_ShotSpeed * m_ShotSpeed * m_ShotSpeed * m_ShotSpeed) - Physics.gravity.y * (calc));
+                double tangent = ( (m_ShotSpeed * m_ShotSpeed) - calc1 ) 
+                    / (Physics.gravity.y * m_TargetDistance);
+
+                double Rad = Math.Atan(tangent);
+                
+                Debug.Log(Rad * Mathf.Rad2Deg);
+
+                m_TankTurret.transform.Rotate(0.0f, 0.0f, (float)Rad * Mathf.Rad2Deg);
+            }
+           
             // Set the fired flag so only Fire is only called once.
             m_Fired = true;
 
             // Create an instance of the shell and store a reference to it's rigidbody.
             Rigidbody shellInstance =
-                Instantiate (m_Shell, m_FireTransform.position, m_FireTransform.rotation) as Rigidbody;
+                Instantiate(m_Shell, m_FireTransform.position, m_FireTransform.rotation) as Rigidbody;
 
-            // Set the shell's velocity to the launch force in the fire position's forward direction.
-            shellInstance.velocity = m_CurrentLaunchForce * m_FireTransform.forward; 
+            if (m_UsingAI)
+            {
+                shellInstance.velocity = m_ShotSpeed * m_FireTransform.forward;
+            }
+            else
+            {
+                // Set the shell's velocity to the launch force in the fire position's forward direction.
+                shellInstance.velocity = m_CurrentLaunchForce * m_FireTransform.forward;
+            }
 
             // Change the clip to the firing clip and play it.
             m_ShootingAudio.clip = m_FireClip;
-            m_ShootingAudio.Play ();
+            m_ShootingAudio.Play();
 
             // Reset the launch force.  This is a precaution in case of missing button events.
             m_CurrentLaunchForce = m_MinLaunchForce;
+            
         }
     }
 }
