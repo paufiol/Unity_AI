@@ -123,7 +123,9 @@ namespace Complete
         {
             // Adjust the rigidbodies position and orientation in FixedUpdate.
             if (m_UsingAi)
+            {
                 MovementDelegate();
+            }
             else
             {
                 Move();
@@ -235,7 +237,7 @@ namespace Complete
                     ret.Add(objects[i].transform);
                     Debug.Log("transform found");
                 }
-                Debug.Log(objects[i].tag);
+               // Debug.Log(objects[i].tag);
             }
            
             return ret.ToArray();
