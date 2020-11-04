@@ -184,7 +184,7 @@ namespace Complete
 
         void Wander()
         {
-           Debug.Log("Wander");
+            //Debug.Log("Wander");
 
             if (!m_Agent.pathPending && m_Agent.remainingDistance < 0.5f)//Afegir LLimit de temps també; Check NavMesh ability
             {

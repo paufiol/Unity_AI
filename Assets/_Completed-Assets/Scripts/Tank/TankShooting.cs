@@ -146,7 +146,7 @@ namespace Complete
         {
             if (m_UsingAI)
             {
-                m_TargetDistance = Vector3.Distance(m_TankTurret.transform.position, m_Target.transform.position);
+                m_TargetDistance = Vector3.Distance(m_FireTransform.position, m_Target.transform.position);
 
                 float calc = Physics.gravity.y * (m_TargetDistance * m_TargetDistance);//; +2 * 0
                 double calc1 = Math.Sqrt( (m_ShotSpeed * m_ShotSpeed * m_ShotSpeed * m_ShotSpeed) - Physics.gravity.y * (calc));
@@ -157,7 +157,7 @@ namespace Complete
                 
                 Debug.Log(Rad * Mathf.Rad2Deg);
 
-                m_TankTurret.transform.Rotate(0.0f, 0.0f, (float)Rad * Mathf.Rad2Deg);
+                m_TankTurret.transform.Rotate((float)Rad * Mathf.Rad2Deg, 0.0f, 0.0f );
             }
            
             // Set the fired flag so only Fire is only called once.
