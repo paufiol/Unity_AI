@@ -157,6 +157,8 @@ namespace Complete
         public void UseWander()
         {
             MovementDelegate = Wander;
+
+            m_Agent = GetComponent<NavMeshAgent>();
         }
 
         public void UsePatrol()
@@ -167,9 +169,41 @@ namespace Complete
             m_PatrolPoints = GetPatrolPoints("PatrolPoint");
         }
 
+        void Seek(Vector3 target)
+        {
+            /*
+                        Vector3 direction = m_Rigidbody.transform.position - m_Rigidbody.position;
+            direction.y = 0;
+            Vector3 movement = direction.normalized * m_Speed;
+            float angle = Mathf.Rad2Deg * Mathf.Atan2(movement.x, movement.z);
+            */
+
+        }
+
         void Wander()
         {
-            Debug.Log("Im wandering");
+           Debug.Log("Wander");
+
+            if (!m_Agent.pathPending && m_Agent.remainingDistance < 0.5f)//Afegir LLimit de temps també; Check NavMesh ability
+            {
+                float radius = 3.0f;
+                float offset = 3.0f;
+
+                Vector3 localTarget = new Vector3(Random.Range(-1.0f, 1.0f), 0, Random.Range(-1.0f, 1.0f));
+                localTarget.Normalize();
+                localTarget *= radius;
+
+                Vector3 direction = transform.forward;
+                direction.Normalize();
+                direction *= offset; 
+
+                localTarget += new Vector3(0.0f, 0.0f, offset);
+
+                Vector3 worldTarget = m_Rigidbody.transform.TransformPoint(localTarget);
+                worldTarget.y = 0.0f;
+
+                m_Agent.destination = worldTarget;
+            }
         }
 
         void Patrol()
