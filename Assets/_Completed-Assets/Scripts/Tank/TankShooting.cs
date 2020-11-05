@@ -144,15 +144,21 @@ namespace Complete
                     / (Physics.gravity.y * m_TargetDistance);
 
                 double Rad = Math.Atan(tangent);
-                
-                Debug.Log(Rad * Mathf.Rad2Deg);
+
+                if(Math.Abs((float)Rad * Mathf.Rad2Deg) > 45 || float.IsNaN(Math.Abs((float)Rad * Mathf.Rad2Deg)))
+                {
+                    Debug.Log("Can't fire, too far");
+                    return; 
+                }
+
+                Debug.Log((float)Rad * Mathf.Rad2Deg);
 
                 m_TankTurret.transform.Rotate((float)Rad * Mathf.Rad2Deg, 0.0f, 0.0f );
             }
-           
-            // Set the fired flag so only Fire is only called once.
-            m_Fired = true;
 
+            // Set the fired flag so only Fire is only called once.
+
+            m_Fired = true;
             // Create an instance of the shell and store a reference to it's rigidbody.
             Rigidbody shellInstance =
                 Instantiate(m_Shell, m_FireTransform.position, m_FireTransform.rotation) as Rigidbody;
