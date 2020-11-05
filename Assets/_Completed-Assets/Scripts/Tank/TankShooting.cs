@@ -3,8 +3,6 @@ using Unity.UNetWeaver;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Complete
-{
     public class TankShooting : MonoBehaviour
     {
 
@@ -79,7 +77,6 @@ namespace Complete
             }
             else
             {
-                RotateCanon();
                 // The slider should have a default value of the minimum launch force.
                 m_AimSlider.value = m_MinLaunchForce;
 
@@ -125,15 +122,6 @@ namespace Complete
                 //Rotate cannon towards enemy
                 var q = Quaternion.LookRotation(m_Target.transform.position - transform.position);
                 m_TankTurret.transform.rotation = Quaternion.RotateTowards(m_TankTurret.transform.rotation, q, 100 * Time.deltaTime);
-            }
-            else
-            {
-                //Rotate cannon using inputs
-                float pitchRotation = Input.GetAxis(m_PitchCanonRotationButton) * m_PitchCanonRotationSpeed * Time.deltaTime;
-                m_TankTurret.transform.Rotate(new Vector3(pitchRotation, 0f, 0f));
-
-                float yawRotation = Input.GetAxis(m_YawCanonRotationButton) * m_YawCanonRotationSpeed * Time.deltaTime;
-                m_TankTurret.transform.Rotate(new Vector3(0f, yawRotation, 0f));
             }
         }
 
@@ -198,6 +186,10 @@ namespace Complete
         {
             m_UsingAi = !m_UsingAi;
             Debug.Log("Enabled/DIsabled AI");
+
+            if(!m_UsingAi)
+            {
+                m_TankTurret.transform.rotation = transform.rotation;
+            }
         }
     }
-}

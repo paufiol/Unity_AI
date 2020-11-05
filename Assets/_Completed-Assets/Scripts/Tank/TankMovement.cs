@@ -3,8 +3,6 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
 
-namespace Complete
-{
     public class TankMovement : MonoBehaviour
     {
         public int m_PlayerNumber = 1;              // Used to identify which tank belongs to which player.  This is set by this tank's manager.
@@ -226,4 +224,3 @@ namespace Complete
             m_UsingAi = !m_UsingAi;
         }
     }
-}

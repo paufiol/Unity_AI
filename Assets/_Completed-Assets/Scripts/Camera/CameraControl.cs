@@ -1,7 +1,5 @@
 ﻿using UnityEngine;
 
-namespace Complete
-{
     public class CameraControl : MonoBehaviour
     {
         public float m_DampTime = 0.2f;                 // Approximate time for the camera to refocus.
@@ -129,4 +127,3 @@ namespace Complete
             m_Camera.orthographicSize = FindRequiredSize ();
         }
     }
-}

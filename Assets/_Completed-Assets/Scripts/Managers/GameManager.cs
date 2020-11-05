@@ -3,8 +3,6 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-namespace Complete
-{
     public class GameManager : MonoBehaviour
     {
         public int m_NumRoundsToWin = 5;            // The number of rounds a single player has to win to win the game.
@@ -21,6 +19,9 @@ namespace Complete
         private TankManager m_RoundWinner;          // Reference to the winner of the current round.  Used to make an announcement of who won.
         private TankManager m_GameWinner;           // Reference to the winner of the game.  Used to make an announcement of who won.
 
+        private void Awake()
+        {
+        }
 
         private void Start()
         {
@@ -271,4 +272,3 @@ namespace Complete
             }
         }
     }
-}

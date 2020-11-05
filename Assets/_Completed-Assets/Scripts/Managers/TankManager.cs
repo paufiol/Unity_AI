@@ -1,8 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Complete
-{
+
     [Serializable]
     public class TankManager
     {
@@ -80,4 +79,3 @@ namespace Complete
             m_Instance.SetActive (true);
         }
     }
-}
