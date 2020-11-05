@@ -1,6 +1,7 @@
 ﻿using Unity.UNetWeaver;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
 
 namespace Complete
 {
@@ -30,12 +31,13 @@ namespace Complete
         int m_CurrentDestination = 0;
         public Transform[] m_PatrolPoints;
         private NavMeshAgent m_Agent;
+
+        public Text m_AiText;
         
         private void Awake ()
         {
             m_Rigidbody = GetComponent<Rigidbody> ();
         }
-
 
         private void OnEnable ()
         {
@@ -56,7 +58,6 @@ namespace Complete
             }
         }
 
-
         private void OnDisable ()
         {
             // When the tank is turned off, set it to kinematic so it stops moving.
@@ -64,11 +65,8 @@ namespace Complete
 
             // Stop all particle system so it "reset" it's position to the actual one instead of thinking we moved when spawning
             for(int i = 0; i < m_particleSystems.Length; ++i)
-            {
                 m_particleSystems[i].Stop();
-            }
         }
-
 
         private void Start ()
         {
@@ -80,7 +78,6 @@ namespace Complete
             m_OriginalPitch = m_MovementAudio.pitch;
         }
 
-
         private void Update ()
         {
             // Store the value of both input axes.
@@ -89,7 +86,6 @@ namespace Complete
 
             EngineAudio ();
         }
-
 
         private void EngineAudio ()
         {
@@ -118,21 +114,20 @@ namespace Complete
             }
         }
 
-
         private void FixedUpdate ()
         {
-            // Adjust the rigidbodies position and orientation in FixedUpdate.
             if (m_UsingAi)
             {
+                m_Agent.isStopped = false;
                 MovementDelegate();
             }
             else
             {
+                m_Agent.isStopped = true;
                 Move();
                 Turn();
             }
         }
-
 
         private void Move ()
         {
@@ -159,33 +154,19 @@ namespace Complete
         public void UseWander()
         {
             MovementDelegate = Wander;
-
             m_Agent = GetComponent<NavMeshAgent>();
+            m_AiText.text = "Wander";
         }
-
         public void UsePatrol()
         {
             MovementDelegate = Patrol;
-
             m_Agent = GetComponent<NavMeshAgent>();
             m_PatrolPoints = GetPatrolPoints("PatrolPoint");
-        }
-
-        void Seek(Vector3 target)
-        {
-            /*
-                        Vector3 direction = m_Rigidbody.transform.position - m_Rigidbody.position;
-            direction.y = 0;
-            Vector3 movement = direction.normalized * m_Speed;
-            float angle = Mathf.Rad2Deg * Mathf.Atan2(movement.x, movement.z);
-            */
-
+            m_AiText.text = "Patrol";
         }
 
         void Wander()
         {
-            //Debug.Log("Wander");
-
             if (!m_Agent.pathPending && m_Agent.remainingDistance < 0.5f)//Afegir LLimit de temps també; Check NavMesh ability
             {
                 float radius = 3.0f;
@@ -221,7 +202,6 @@ namespace Complete
                 Debug.Log("There are no patrolling points");
                 return; 
             }
-
             m_Agent.destination = m_PatrolPoints[m_CurrentDestination].position;
             m_CurrentDestination = (m_CurrentDestination + 1) % m_PatrolPoints.Length;
         }
@@ -235,13 +215,15 @@ namespace Complete
                 if(objects[i].tag == tag)
                 {
                     ret.Add(objects[i].transform);
-                    Debug.Log("transform found");
+                    Debug.Log("Patrolling Point Found");
                 }
-               // Debug.Log(objects[i].tag);
-            }
-           
+            }        
             return ret.ToArray();
+        }
 
+        public void ToggleAi()
+        {
+            m_UsingAi = !m_UsingAi;
         }
     }
 }

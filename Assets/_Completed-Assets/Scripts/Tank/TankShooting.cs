@@ -8,7 +8,7 @@ namespace Complete
     public class TankShooting : MonoBehaviour
     {
 
-        public bool m_UsingAI = true;
+        public bool m_UsingAi = true;
         public int m_PlayerNumber = 1;              // Used to identify the different players.
         public Rigidbody m_Shell;                   // Prefab of the shell.
         public Transform m_FireTransform;           // A child of the tank where the shells are spawned.
@@ -62,15 +62,19 @@ namespace Complete
 
         private void Update ()
         {
-            if (m_UsingAI)
+            if (m_UsingAi)
             {
+                //SHot delay count
                 m_ShotTimer -= Time.deltaTime;
+
+                //Rotate cannon to face enemy tank
                 RotateCanon();
 
+                //Shot delay finished
                 if (m_ShotTimer <= 0.0f)
                 {
                     Fire();
-                    m_ShotTimer = 3.0f;
+                    m_ShotTimer = UnityEngine.Random.Range(3, 6);
                 }
             }
             else
@@ -116,14 +120,15 @@ namespace Complete
 
         private void RotateCanon()
         {
-            if (m_UsingAI)
+            if (m_UsingAi)
             {
-
+                //Rotate cannon towards enemy
                 var q = Quaternion.LookRotation(m_Target.transform.position - transform.position);
                 m_TankTurret.transform.rotation = Quaternion.RotateTowards(m_TankTurret.transform.rotation, q, 100 * Time.deltaTime);
             }
             else
             {
+                //Rotate cannon using inputs
                 float pitchRotation = Input.GetAxis(m_PitchCanonRotationButton) * m_PitchCanonRotationSpeed * Time.deltaTime;
                 m_TankTurret.transform.Rotate(new Vector3(pitchRotation, 0f, 0f));
 
@@ -134,8 +139,9 @@ namespace Complete
 
         private void Fire ()
         {
-            if (m_UsingAI)
+            if (m_UsingAi)
             {
+                //Calculate angle to hit enemy tank
                 m_TargetDistance = Vector3.Distance(m_FireTransform.position, m_Target.transform.position);
 
                 float calc = Physics.gravity.y * (m_TargetDistance * m_TargetDistance);//; +2 * 0
@@ -145,17 +151,24 @@ namespace Complete
 
                 double Rad = Math.Atan(tangent);
 
+                //Check if angle is correct
                 if(Math.Abs((float)Rad * Mathf.Rad2Deg) > 45 || float.IsNaN(Math.Abs((float)Rad * Mathf.Rad2Deg)))
                 {
+                    //If not correct don't shoot
                     Debug.Log("Can't fire, too far");
                     return; 
                 }
 
-                Debug.Log((float)Rad * Mathf.Rad2Deg);
-
+                Debug.Log(-((float)Rad * Mathf.Rad2Deg));
+                //Rotate cannon to desired angle
                 m_TankTurret.transform.Rotate((float)Rad * Mathf.Rad2Deg, 0.0f, 0.0f );
             }
+            
+            ShootBullet();
+        }
 
+        void ShootBullet()
+        {
             // Set the fired flag so only Fire is only called once.
 
             m_Fired = true;
@@ -163,8 +176,9 @@ namespace Complete
             Rigidbody shellInstance =
                 Instantiate(m_Shell, m_FireTransform.position, m_FireTransform.rotation) as Rigidbody;
 
-            if (m_UsingAI)
+            if (m_UsingAi)
             {
+                //Shoot at set shot speed
                 shellInstance.velocity = m_ShotSpeed * m_FireTransform.forward;
             }
             else
@@ -179,7 +193,11 @@ namespace Complete
 
             // Reset the launch force.  This is a precaution in case of missing button events.
             m_CurrentLaunchForce = m_MinLaunchForce;
-            
+        }
+        public void ToggleAi()
+        {
+            m_UsingAi = !m_UsingAi;
+            Debug.Log("Enabled/DIsabled AI");
         }
     }
 }
