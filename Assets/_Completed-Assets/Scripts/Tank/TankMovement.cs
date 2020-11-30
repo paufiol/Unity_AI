@@ -167,8 +167,8 @@ using UnityEngine.UI;
         {
             if (!m_Agent.pathPending && m_Agent.remainingDistance < 0.5f)//Afegir LLimit de temps també; Check NavMesh ability
             {
-                float radius = 3.0f;
-                float offset = 3.0f;
+                float radius = 1.0f;
+                float offset = 4.0f;
 
                 Vector3 localTarget = new Vector3(Random.Range(-1.0f, 1.0f), 0, Random.Range(-1.0f, 1.0f));
                 localTarget.Normalize();

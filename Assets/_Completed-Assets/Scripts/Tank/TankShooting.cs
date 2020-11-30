@@ -120,7 +120,7 @@ using UnityEngine.UI;
             {
                 //Rotate cannon towards enemy
                 var q = Quaternion.LookRotation(m_Target.transform.position - transform.position);
-                m_TankTurret.transform.rotation = Quaternion.RotateTowards(m_TankTurret.transform.rotation, q, 100 * Time.deltaTime);
+                m_TankTurret.transform.rotation = Quaternion.RotateTowards(m_TankTurret.transform.rotation, q, 300 * Time.deltaTime);
             }
         }
 
