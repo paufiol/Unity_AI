@@ -50,16 +50,16 @@ using UnityEngine.UI;
 
             }
 
-            for (int y = 0; y < m_Tanks.Length; y++)
-            {
-                m_Tanks[y].m_Instance.GetComponent<TankShooting>().m_Target = m_Tanks[(y + 1) % (m_Tanks.Length )].m_Instance;
-                if (y == 0)
-                    m_Tanks[y].m_Instance.GetComponent<TankMovement>().UseWander();
-                if(y==1)
-                    m_Tanks[y].m_Instance.GetComponent<TankMovement>().UsePatrol();
-            }
+        //for (int y = 0; y < m_Tanks.Length; y++)
+        //{
+        //    m_Tanks[y].m_Instance.GetComponent<TankShooting>().m_Target = m_Tanks[(y + 1) % (m_Tanks.Length)].m_Instance;
+        //    if (y == 0)
+        //        m_Tanks[y].m_Instance.GetComponent<TankMovement>().UseWander();
+        //    if (y == 1)
+        //        m_Tanks[y].m_Instance.GetComponent<TankMovement>().UsePatrol();
+        //}
 
-        }
+    }
         private void SetCameraTargets()
         {
             // Create a collection of transforms the same size as the number of tanks.
