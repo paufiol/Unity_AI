@@ -7,14 +7,21 @@ namespace BBUnity.Actions
     /// <summary>
     /// It is an action to move towards the given goal using a NavMeshAgent.
     /// </summary>
-    [Action("Navigation/MoveToGameObject")]
+    [Action("Navigation/GoReload")]
     [Help("Moves the game object towards a given target by using a NavMeshAgent")]
-    public class MoveToGameObject : GOAction
+    public class GoReload : GOAction
     {
         ///<value>Input target game object towards this game object will be moved Parameter.</value>
         [InParam("target")]
         [Help("Target game object towards this game object will be moved")]
         public GameObject target;
+
+        [InParam("ReloadValue")]
+        public int ReloadValue;
+
+        [OutParam("ammoReload")]
+
+        public int ammoReload;
 
         private UnityEngine.AI.NavMeshAgent navAgent;
 
@@ -51,10 +58,14 @@ namespace BBUnity.Actions
         /// y, the task is running, if it is still moving to the target.</remarks>
         public override TaskStatus OnUpdate()
         {
+            Debug.Log("moving to reload zone");
             if (target == null)
                 return TaskStatus.FAILED;
             if (!navAgent.pathPending && navAgent.remainingDistance <= navAgent.stoppingDistance)
+            {
+                ammoReload = ReloadValue;
                 return TaskStatus.COMPLETED;
+            }
             else if (navAgent.destination != targetTransform.position)
                 navAgent.SetDestination(targetTransform.position);
             return TaskStatus.RUNNING;

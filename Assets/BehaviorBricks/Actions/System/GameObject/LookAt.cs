@@ -16,6 +16,9 @@ namespace BBUnity.Actions
         [Help("Target game object")]
         public GameObject target;
 
+        [InParam("TankTurret")]
+        public GameObject TankTurret;
+
         private Transform targetTransform;
 
         /// <summary>Initialization Method of LookAt.</summary>
@@ -24,7 +27,7 @@ namespace BBUnity.Actions
         {
             if (target == null)
             {
-                Debug.LogError("The look target of this game object is null", gameObject);
+                Debug.LogError("The look target of this game object is null", TankTurret);
                 return;
             }
             targetTransform = target.transform;
@@ -38,7 +41,7 @@ namespace BBUnity.Actions
             if (target == null)
                 return TaskStatus.FAILED;
             Vector3 lookPos = targetTransform.position;
-            gameObject.transform.LookAt(lookPos);
+            TankTurret.transform.LookAt(lookPos);
             return TaskStatus.COMPLETED;
         }
     }

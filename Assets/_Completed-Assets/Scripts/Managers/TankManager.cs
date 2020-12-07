@@ -1,4 +1,5 @@
 ﻿using BBUnity;
+using BBUnity.Actions;
 using System;
 using UnityEngine;
 
@@ -41,7 +42,7 @@ using UnityEngine;
             // Get all of the renderers of the tank.
             MeshRenderer[] renderers = m_Instance.GetComponentsInChildren<MeshRenderer> ();
 
-             //m_Instance.GetComponent<BehaviorExecutor>().blackboard.SetBehaviorParam("Tank", m_Instance);
+             
 
             // Go through all the renderers...
             for (int i = 0; i < renderers.Length; i++)

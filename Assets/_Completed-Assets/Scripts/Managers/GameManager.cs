@@ -39,6 +39,7 @@ using UnityEngine.UI;
 
         private void SpawnAllTanks()
         {
+
             // For all the tanks...
             for (int i = 0; i < m_Tanks.Length; i++)
             {
@@ -47,19 +48,37 @@ using UnityEngine.UI;
                     Instantiate(m_TankPrefab, m_Tanks[i].m_SpawnPoint.position, m_Tanks[i].m_SpawnPoint.rotation) as GameObject;
                 m_Tanks[i].m_PlayerNumber = i + 1;
                 m_Tanks[i].Setup();
+                if(i == 0)
+                    m_Tanks[i].m_Instance.GetComponent<BehaviorExecutor>().blackboard.SetBehaviorParam("reloadZone", GameObject.FindGameObjectWithTag("reloadZone"));
+                else
+                    m_Tanks[i].m_Instance.GetComponent<BehaviorExecutor>().blackboard.SetBehaviorParam("reloadZone", GameObject.FindGameObjectWithTag("reloadZone2"));
+               
 
             }
 
-        //for (int y = 0; y < m_Tanks.Length; y++)
-        //{
-        //    m_Tanks[y].m_Instance.GetComponent<TankShooting>().m_Target = m_Tanks[(y + 1) % (m_Tanks.Length)].m_Instance;
-        //    if (y == 0)
-        //        m_Tanks[y].m_Instance.GetComponent<TankMovement>().UseWander();
-        //    if (y == 1)
-        //        m_Tanks[y].m_Instance.GetComponent<TankMovement>().UsePatrol();
-        //}
+            for (int y = 0; y < m_Tanks.Length; y++)
+            {
+                if (y == 0) //Wander
+                {
+                    m_Tanks[y].m_Instance.GetComponent<BehaviorExecutor>().blackboard.SetBehaviorParam("Target", m_Tanks[1].m_Instance);
+                    m_Tanks[y].m_Instance.GetComponent<BehaviorExecutor>().blackboard.SetBehaviorParam("IsWanderer", true);
+                    m_Tanks[y].m_Instance.GetComponent<BehaviorExecutor>().blackboard.SetBehaviorParam("IsPatroller", false);
+                    m_Tanks[y].m_Instance.GetComponentInChildren<Text>().text = "Wanderer";
+                }   
 
-    }
+                if (y == 1) //Patrol
+                {
+                    m_Tanks[y].m_Instance.GetComponent<BehaviorExecutor>().blackboard.SetBehaviorParam("Target", m_Tanks[0].m_Instance);
+                    m_Tanks[y].m_Instance.GetComponent<BehaviorExecutor>().blackboard.SetBehaviorParam("IsPatroller", true);
+                    m_Tanks[y].m_Instance.GetComponent<BehaviorExecutor>().blackboard.SetBehaviorParam("IsWanderer", false);
+                    m_Tanks[y].m_Instance.GetComponentInChildren<Text>().text = "Patroller";
+
+                }   
+            }
+
+        }
+
+        
         private void SetCameraTargets()
         {
             // Create a collection of transforms the same size as the number of tanks.
