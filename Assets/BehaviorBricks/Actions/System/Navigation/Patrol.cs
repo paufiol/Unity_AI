@@ -1,8 +1,6 @@
 ﻿using Pada1.BBCore;
 using Pada1.BBCore.Tasks;
 using UnityEngine;
-using UnityEngine.AI;
-using UnityEngine.UI;
 
 namespace BBUnity.Actions
 {
